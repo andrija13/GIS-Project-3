@@ -126,12 +126,12 @@ namespace GISWeb.Services
                                     JOIN sumo_fcd_data AS car
                                     ON ST_DWithin(road.way, car.way, 4)
                                     WHERE timestep_time >= {0} AND timestep_time <= {1}
-                                    GROUP BY road.name
+                                    GROUP BY car.vehicle_id, road.name
                                     HAVING {2}
                                     ) C ON l.name = C.roadName
                                     ORDER BY {3}
                                     LIMIT 100
-                                    ) as t;",
+                                ) as t;",
                                 startTime, endTime, havingQuery, orderBy);
 
             using (NpgsqlCommand command = new NpgsqlCommand(sqlSelect, connection))

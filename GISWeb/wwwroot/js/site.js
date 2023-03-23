@@ -15,6 +15,7 @@ var basicFilterLayer;
 var spatialFilterLayer;
 var temporalLayer;
 var trajectoryLayer;
+var trafficLayer;
 
 //Layers styles
 var educationStyle = { "color": "#684013", "weight": 4, "opacity": 0.7 };
@@ -45,6 +46,9 @@ const defRoadsFilter = "highway IS NOT NULL";
 //Layer group
 var layerGroup = new L.LayerGroup();
 
+//Legend
+var legend = L.control({ position: 'topright' });
+
 //Properties
 var lineProperties = [];
 var pointProperties = [];
@@ -59,15 +63,15 @@ $(document).ready(function () {
     }).addTo(map);
 
     layerGroup.addTo(map);
+    legend.addTo(map);
 
     getProperties(line);
     getProperties(point);
     getProperties(poly);
 });
 
-
-$('#educationCheck').change(function () {
-    if (this.checked) {
+function educationChange() {
+    if ($('#educationCheck').is(':checked')) {
         var filter = defEducationFiler;
         callWFSService(education, educationStyle, poly, filter).then((res) => {
             education = res;
@@ -76,10 +80,10 @@ $('#educationCheck').change(function () {
     else {
         layerGroup.removeLayer(education);
     }
-});
+}
 
-$('#hospitalCheck').change(function () {
-    if (this.checked) {
+function hospitalChange() {
+    if ($('#hospitalCheck').is(':checked')) {
         var filter = defHospitalFiler;
         callWFSService(hospital, hospitalStyle, poly, filter).then((res) => {
             hospital = res;
@@ -88,10 +92,10 @@ $('#hospitalCheck').change(function () {
     else {
         layerGroup.removeLayer(hospital);
     }
-});
+}
 
-$('#gasCheck').change(function () {
-    if (this.checked) {
+function gasChange() {
+    if ($('#gasCheck').is(':checked')) {
         var filter = defGasFilter;
         callWFSService(gas, null, point, filter).then((res) => {
             gas = res;
@@ -100,10 +104,10 @@ $('#gasCheck').change(function () {
     else {
         layerGroup.removeLayer(gas);
     }
-});
+}
 
-$('#sportCheck').change(function () {
-    if (this.checked) {
+function sportChange() {
+    if ($('#sportCheck').is(':checked')) {
         var filter = defSportFilter;
         callWFSService(sport, sportStyle, poly, filter).then((res) => {
             sport = res;
@@ -112,10 +116,10 @@ $('#sportCheck').change(function () {
     else {
         layerGroup.removeLayer(sport);
     }
-});
+}
 
-$('#pharmacyCheck').change(function () {
-    if (this.checked) {
+function pharmacyChange() {
+    if ($('#pharmacyCheck').is(':checked')) {
         var filter = defPharmacyFilter;
         callWFSService(pharmacy, null, point, filter).then((res) => {
             pharmacy = res;
@@ -124,47 +128,47 @@ $('#pharmacyCheck').change(function () {
     else {
         layerGroup.removeLayer(pharmacy);
     }
-});
+}
 
-$('#forestCheck').change(function () {
-    if (this.checked) {
+function forestChange() {
+    if ($('#forestCheck').is(':checked')) {
         var filter = defForestFilter;
         forest = callWMSService(forest, "ForestStyle", poly, filter)
     }
     else {
         layerGroup.removeLayer(forest);
     }
-});
+}
 
-$('#riverCheck').change(function () {
-    if (this.checked) {
+function riverChange() {
+    if ($('#riverCheck').is(':checked')) {
         var filter = defRiverFilter;
         river = callWMSService(river, 'line', line, filter)
     }
     else {
         layerGroup.removeLayer(river);
     }
-});
+}
 
-$('#railwayCheck').change(function () {
-    if (this.checked) {
+function railwayChange() {
+    if ($('#railwayCheck').is(':checked')) {
         var filter = defRailwayFilter;
         railway = callWMSService(railway, 'RailwaysStyle', line, filter)
     }
     else {
         layerGroup.removeLayer(railway);
     }
-});
+}
 
-$('#roadCheck').change(function () {
-    if (this.checked) {
+function roadChange() {
+    if ($('#roadCheck').is(':checked')) {
         var filter = defRoadsFilter;
         roads = callWMSService(roads, 'simple_roads', line, filter)
     }
     else {
         layerGroup.removeLayer(roads);
     }
-});
+}
 
 // Ajax call WFS service - GetFeature request
 function callWFSService(layer, style, type, filter, addToMap = 1) {
@@ -268,8 +272,8 @@ function addPopup(feature, layer) {
         var infoText = '';
         for (const [key, value] of Object.entries(feature.properties)) {
             if (key != 'osm_id' && key != 'z_order' && key != 'way_area' && value != null) {
-                if (key == "vehicle_speed") {
-                    infoText += `${key}: ${value * 1.609344}, `;
+                if (key == "vehicle_speed" || key == "average_speed") {
+                    infoText += `${key}: ${parseFloat(value * 1.609344).toFixed(2)}, `;
                 }
                 else {
                     infoText += `${key}: ${value}, `;
@@ -579,6 +583,18 @@ function getTemporalData(type, operator, value, startTime, endTime, style) {
     });
 }
 
+function resetTemporalSearch() {
+    $('#temporalType').val("");
+    $('#temporalOperator').val("");
+    $('#temporalValue').val("");
+    $('#temporalStartTime').val("");
+    $('#temporalEndTime').val("");
+
+    if (temporalLayer != undefined && temporalLayer != null) {
+        layerGroup.removeLayer(temporalLayer);
+    }
+}
+
 function trajectoriesSearch() {
     var type = $('#TypeOfVehicle').val();
     if (type == "" || type == null) {
@@ -608,12 +624,106 @@ function trajectoriesSearch() {
         layerGroup.removeLayer(trajectoryLayer);
     }
 
-    //var tt = "GeoCollection"
-    //var ff = ``;
     var filter = "vehicle_id IN ('" + vehicle + "') AND timestep_time >= " + startTime + " AND timestep_time <= " + endTime;
 
     callWFSService(trajectoryLayer, "point", traffic, filter).then((res) => {
         trajectoryLayer = res;
     });
+}
 
+function resetTrajectoriesSearch() {
+    $('#TypeOfVehicle').val("");
+    $('#VehicleId').val("");
+    $('#trajectoryStartTime').val("");
+    $('#trajectoryEndTime').val("");
+    $('#VehicleId').empty().append('<option selected="selected" hidden disabled>Select vehicle</option>')
+
+    if (trajectoryLayer != undefined && trajectoryLayer != null) {
+        layerGroup.removeLayer(trajectoryLayer);
+    }
+}
+
+function trafficJamSearch() {
+    var startTime = $('#trafficStartTime').val();
+    if (startTime == "" || startTime == null) {
+        alert('Please enter time');
+        return;
+    }
+
+    if (trafficLayer != undefined && trafficLayer != null) {
+        layerGroup.removeLayer(trafficLayer);
+    }
+    var filter = "timestep_time = " + startTime;
+    trafficLayer = callWMSService(trafficLayer, "PointStacker", traffic, filter);
+}
+
+function resetTrafficJamSearch() {
+    $('#trafficStartTime').val("");
+
+    if (trafficLayer != undefined && trafficLayer != null) {
+        layerGroup.removeLayer(trafficLayer);
+    }
+}
+
+legend.onAdd = function () {
+    var div = L.DomUtil.create('div', 'legend');
+    div.innerHTML = `
+            <div class="form-check form-switch" style="margin-top: 5px;">
+            <div class="legend-tag education"></div>
+            <input class="form-check-input" type="checkbox" onchange="educationChange()" id="educationCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Educational inst..</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag hospital"></div>
+            <input class="form-check-input" type="checkbox" onchange="hospitalChange()" id="hospitalCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Hospitals</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag sport"></div>
+            <input class="form-check-input" type="checkbox" onchange="sportChange()" id="sportCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Sport institutions</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag gas">
+                <img class="marker" src="marker-default.png" />
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="gasChange()" id="gasCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Gas stations</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag pharmacy">
+                <img class="marker" src="marker-red.png" />
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="pharmacyChange()" id="pharmacyCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Pharmacies</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag forest">
+                <div class="line"></div>
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="forestChange()" id="forestCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Forests</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag river">
+                <div class="line"></div>
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="riverChange()" id="riverCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Rivers</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag railway">
+                <div class="line"></div>
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="railwayChange()" id="railwayCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Railways</label>
+        </div>
+        <div class="form-check form-switch">
+            <div class="legend-tag roads">
+                <div class="line"></div>
+            </div>
+            <input class="form-check-input" type="checkbox" onchange="roadChange()" id="roadCheck">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Roads</label>
+        </div>`;
+    return div;
 }

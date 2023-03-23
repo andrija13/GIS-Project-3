@@ -7,69 +7,10 @@
 }
 
 <div class="legendDiv col-sm-3">
-    <div class="legend">Legend:</div>
-    <div class="form-check form-switch">
-        <div class="legend-tag education"></div>
-        <input class="form-check-input" type="checkbox" id="educationCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Educational institutions</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag hospital"></div>
-        <input class="form-check-input" type="checkbox" id="hospitalCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Hospitals</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag sport"></div>
-        <input class="form-check-input" type="checkbox" id="sportCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Sport institutions</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag gas">
-            <img class="marker" src="marker-default.png" />
-        </div>
-        <input class="form-check-input" type="checkbox" id="gasCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Gas stations</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag pharmacy">
-            <img class="marker" src="marker-red.png" />
-        </div>
-        <input class="form-check-input" type="checkbox" id="pharmacyCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Pharmacies</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag forest">
-            <div class="line"></div>
-        </div>
-        <input class="form-check-input" type="checkbox" id="forestCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Forests</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag river">
-            <div class="line"></div>
-        </div>
-        <input class="form-check-input" type="checkbox" id="riverCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Rivers</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag railway">
-            <div class="line"></div>
-        </div>
-        <input class="form-check-input" type="checkbox" id="railwayCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Railways</label>
-    </div>
-    <div class="form-check form-switch">
-        <div class="legend-tag roads">
-            <div class="line"></div>
-        </div>
-        <input class="form-check-input" type="checkbox" id="roadCheck">
-        <label class="form-check-label" for="flexSwitchCheckChecked">Roads</label>
-    </div>
-
     @*Filtriranje objekata*@
     <div class="filter">
         <div class="basicFilter">
-            <p>Basic filter</p>
+            <label>Basic layer search:</label>
             <div>
                 @Html.DropDownList("BasicFilterLayer", listOfLayers, "Select layers", new { @class = "form-control"})
             </div>
@@ -78,11 +19,11 @@
             </div>
             <div>
                 <input class="form-control" id="basicFilterCondition" placeholder="Type a condition..." />
-                <p style="font-size:8pt">
+                <label style="font-size:8pt">
                     Allowed operators: =,&lt,&gt,&gt=,&lt=,!=, LIKE, IN, NOT IN, NOT 
                     <br />
                     Example: LIKE '%Александар%'
-                </p>
+                </label>
             </div>
             <div>
                 <button type="button" class="btn btn-primary" id="btnBasicFilter" onclick="basicSearch()">Search</button>
@@ -90,15 +31,13 @@
             </div>
         </div>
         <div class="spatialFilter">
-            <p>Spatial filter</p>
+            <label>Spatial layer filter:</label>
             <div>
                 @Html.DropDownList("SpatialLeftLayer", listOfLayers, "Select first layers", new { @class = "form-control"})
             </div>
-            <div>
+            <div class="raw" style="display:flex;">
                 @Html.DropDownList("SpatialOperator", listOfOperators, "Select operator", new { @class = "form-control"})
-            </div>
-            <div>
-                <input class="form-control" type="number" id="spatialDistance" placeholder="Type a distance (in meter)..." style="display:none;"/>
+                <input class="form-control" type="number" min="0" id="spatialDistance" placeholder="Distance (in meter)" style="display:none;"/>
             </div>
             <div>
                 @Html.DropDownList("SpatialRightLayer", listOfLayers, "Select second layers", new { @class = "form-control"})
@@ -109,16 +48,15 @@
             </div>
         </div>
         <div class="spatialTemporalFilter">
-            <p>Spatial temporal filter</p>
             <div>
-                Find all roads where:
+                <label>Find all roads where:</label>
                 <select class="form-control" id="temporalType">
                     <option disabled hidden>Select type of query</option>
                     <option value="0">Number of car</option>
                     <option value="1">Average speed</option>
                 </select>
             </div>
-            <div>
+            <div class="raw" style="display:flex;">
                 <select class="form-control" id="temporalOperator">
                     <option disabled hidden>Select operator</option>
                     <option value="0">=</option>
@@ -127,13 +65,11 @@
                     <option value="3">&gt=</option>
                     <option value="4">&lt=</option>
                 </select>
-            </div>
-            <div>
                 <input class="form-control" type="number" id="temporalValue" placeholder="Type a value..."/>
             </div>
             <div class="raw" style="display:flex;">
-                <input class="form-control" type="number" id="temporalStartTime" min="0" max="3600" placeholder="Start time (min: 0)" />
-                <input class="form-control" type="number" id="temporalEndTime" min="0" max="3600" placeholder="End time (max: 3600)" />
+                <input class="form-control" type="number" id="temporalStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
+                <input class="form-control" type="number" id="temporalEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
                 <button type="button" class="btn btn-primary" id="btnTemporalFilter" onclick="temporalSearch()">Search</button>
@@ -141,7 +77,7 @@
             </div>
         </div>
         <div class="trajectoriesFilter">
-            <p>Trajectories filter</p>
+            <label>Find trajectories of vehicles:</label>
             <div>
                 @Html.DropDownList("TypeOfVehicle", vehicleTypes, "Select type of vehicle", new { @class = "form-control"})
             </div>
@@ -149,12 +85,22 @@
                 @Html.DropDownList("VehicleId", new List<SelectListItem>(), "Select vehicle", new { @class = "form-control"})
             </div>
             <div class="raw" style="display:flex;">
-                <input class="form-control" type="number" id="trajectoryStartTime" min="0" max="3600" placeholder="Start time (min: 0)" />
-                <input class="form-control" type="number" id="trajectoryEndTime" min="0" max="3600" placeholder="End time (max: 3600)" />
+                <input class="form-control" type="number" id="trajectoryStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
+                <input class="form-control" type="number" id="trajectoryEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
                 <button type="button" class="btn btn-primary" id="btnTrajectoriesFilter" onclick="trajectoriesSearch()">Search</button>
                 <button type="button" class="btn btn-danger" id="btnResetTrajectoriesFilter" onclick="resetTrajectoriesSearch()">Reset filter</button>
+            </div>
+        </div>
+        <div class="trafficFilter">
+            <label>Find popular area at:</label>
+            <div class="raw" style="display:flex;">
+                <input class="form-control" type="number" id="trafficStartTime" min="0" max="2500" placeholder="Enter time (min: 0, max: 2500)" />
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" id="btnTrafficFilter" onclick="trafficJamSearch()">Search</button>
+                <button type="button" class="btn btn-danger" id="btnResetTrafficsFilter" onclick="resetTrafficJamSearch()">Reset filter</button>
             </div>
         </div>
     </div>

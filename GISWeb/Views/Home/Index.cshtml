@@ -7,7 +7,6 @@
 }
 
 <div class="legendDiv col-sm-3">
-    @*Filtriranje objekata*@
     <div class="filter">
         <div class="basicFilter">
             <label>Basic layer search:</label>
@@ -20,14 +19,14 @@
             <div>
                 <input class="form-control" id="basicFilterCondition" placeholder="Type a condition..." />
                 <label style="font-size:8pt">
-                    Allowed operators: =,&lt,&gt,&gt=,&lt=,!=, LIKE, IN, NOT IN, NOT 
+                    Allowed operators: =,&lt,&gt,&gt=,&lt=, LIKE, IN, NOT
                     <br />
                     Example: LIKE '%Александар%'
                 </label>
             </div>
             <div>
-                <button type="button" class="btn btn-primary" id="btnBasicFilter" onclick="basicSearch()">Search</button>
-                <button type="button" class="btn btn-danger" id="btnResetBasicFilter" onclick="resetBasicSearch()">Reset filter</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnBasicFilter" onclick="basicSearch()">Search</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetBasicFilter" onclick="resetBasicSearch()">Reset</button>
             </div>
         </div>
         <div class="spatialFilter">
@@ -43,8 +42,8 @@
                 @Html.DropDownList("SpatialRightLayer", listOfLayers, "Select second layers", new { @class = "form-control"})
             </div>
             <div>
-                <button type="button" class="btn btn-primary" id="btnSpatialFilter" onclick="spatialSearch()">Search</button>
-                <button type="button" class="btn btn-danger" id="btnResetSpatialFilter" onclick="resetSpatialSearch()">Reset filter</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnSpatialFilter" onclick="spatialSearch()">Search</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetSpatialFilter" onclick="resetSpatialSearch()">Reset</button>
             </div>
         </div>
         <div class="spatialTemporalFilter">
@@ -72,8 +71,8 @@
                 <input class="form-control" type="number" id="temporalEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
-                <button type="button" class="btn btn-primary" id="btnTemporalFilter" onclick="temporalSearch()">Search</button>
-                <button type="button" class="btn btn-danger" id="btnResetTemporalFilter" onclick="resetTemporalSearch()">Reset filter</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnTemporalFilter" onclick="temporalSearch()">Search</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetTemporalFilter" onclick="resetTemporalSearch()">Reset</button>
             </div>
         </div>
         <div class="trajectoriesFilter">
@@ -89,8 +88,8 @@
                 <input class="form-control" type="number" id="trajectoryEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
-                <button type="button" class="btn btn-primary" id="btnTrajectoriesFilter" onclick="trajectoriesSearch()">Search</button>
-                <button type="button" class="btn btn-danger" id="btnResetTrajectoriesFilter" onclick="resetTrajectoriesSearch()">Reset filter</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnTrajectoriesFilter" onclick="trajectoriesSearch()">Search</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetTrajectoriesFilter" onclick="resetTrajectoriesSearch()">Reset</button>
             </div>
         </div>
         <div class="trafficFilter">
@@ -99,8 +98,8 @@
                 <input class="form-control" type="number" id="trafficStartTime" min="0" max="2500" placeholder="Enter time (min: 0, max: 2500)" />
             </div>
             <div>
-                <button type="button" class="btn btn-primary" id="btnTrafficFilter" onclick="trafficJamSearch()">Search</button>
-                <button type="button" class="btn btn-danger" id="btnResetTrafficsFilter" onclick="resetTrafficJamSearch()">Reset filter</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btnTrafficFilter" onclick="trafficJamSearch()">Search</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" id="btnResetTrafficsFilter" onclick="resetTrafficJamSearch()">Reset</button>
             </div>
         </div>
     </div>

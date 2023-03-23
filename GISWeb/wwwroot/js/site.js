@@ -170,151 +170,6 @@ function roadChange() {
     }
 }
 
-// Ajax call WFS service - GetFeature request
-function callWFSService(layer, style, type, filter, addToMap = 1) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: "http://localhost:8080/geoserver/GIS/wfs",
-            data: {
-                service: "WFS",
-                version: "1.0.0",
-                request: "GetFeature",
-                typeName: type,
-                cql_filter: filter,
-                outputFormat: "application/json",
-                srsName: "epsg:4326",
-            },
-            dataType: "json",
-            success: function (response) {
-                layer = L.geoJSON(response, {
-                    style: style,
-                    pointToLayer: createCustomMarker,
-                    onEachFeature: addPopup
-                });
-
-                if (addToMap) {
-                    layerGroup.addLayer(layer);
-                }
-
-                resolve(layer);
-            },
-            error: function (error) {
-                reject(error)
-            }
-        })
-    })
-}
-
-// Leaflet call WMS service - GetMap request
-function callWMSService(layer, style, type, filter) {
-    var layer = new L.tileLayer.wms(
-        'http://localhost:8080/geoserver/GIS/wms',
-        {
-            layers: type,
-            format: 'image/png',
-            styles: style,
-            transparent: true,
-            cql_filter: filter
-        },
-    )
-    layerGroup.addLayer(layer);
-    return layer;
-}
-
-function getProperties(type) {
-    $.ajax({
-        url: "http://localhost:8080/geoserver/GIS/wfs",
-        data: {
-            service: "WFS",
-            version: "1.0.0",
-            request: "DescribeFeatureType",
-            typeName: type,
-            outputFormat: "application/json"
-        },
-        dataType: "json",
-        success: function (response) {
-            if (type == "planet_osm_line" && lineProperties.length == 0) {
-                response.featureTypes[0].properties.forEach(x => {
-                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
-                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
-                        lineProperties.push(x.name)
-                    }
-                });
-            }
-
-            if (type == "planet_osm_polygon" && polyProperties.length == 0) {
-                response.featureTypes[0].properties.forEach(x => {
-                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
-                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
-                        polyProperties.push(x.name)
-                    }
-                });
-            }
-
-            if (type == "planet_osm_point" && pointProperties.length == 0) {
-                response.featureTypes[0].properties.forEach(x => {
-                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
-                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
-                        pointProperties.push(x.name)
-                    }
-                });
-            }
-        },
-        error: function (error) {
-            console.log(error);
-        }
-    })
-}
-
-// Add popup to layer
-function addPopup(feature, layer) {
-    if (feature.properties != null) {
-        var infoText = '';
-        for (const [key, value] of Object.entries(feature.properties)) {
-            if (key != 'osm_id' && key != 'z_order' && key != 'way_area' && value != null) {
-                if (key == "vehicle_speed" || key == "average_speed") {
-                    infoText += `${key}: ${parseFloat(value * 1.609344).toFixed(2)}, `;
-                }
-                else {
-                    infoText += `${key}: ${value}, `;
-                }
-            }
-
-        }
-        layer.bindPopup(infoText);
-    }
-}
-
-// Custom marker to layer
-function createCustomMarker(feature, latlng) {
-    if (feature.properties != null && feature.properties.amenity != null && feature.properties.amenity == 'pharmacy') {
-        var myIcon = L.icon({
-            iconUrl: 'marker-red.png',
-            iconSize: [20, 35],
-            iconAnchor: [10, 35],
-            popupAnchor: [0, -35],
-        })
-        return L.marker(latlng, { icon: myIcon });
-    }
-    else if (feature.properties != null && feature.properties.amenity != null && feature.properties.amenity == 'fuel') {
-        var myIcon = L.icon({
-            iconUrl: 'marker-default.png',
-            iconSize: [20, 35],
-            iconAnchor: [10, 35],
-            popupAnchor: [0, -35],
-        })
-        return L.marker(latlng, { icon: myIcon });
-    }
-    else{
-        var style = {
-            radius: 3,
-            color: '#FF0000',
-            opacity: 0.75,
-        }
-        return L.circleMarker(latlng, style);
-    }
-}
-
 $('#BasicFilterLayer').on('change', function (e) {
     $('#BasicAttribute').empty().append('<option selected="selected" hidden disabled>Select attribute</option>')
     var arrayAttribute = getPropertyArrayBySelectValue(this.value);
@@ -415,66 +270,6 @@ function spatialSearch() {
     }
 
     getSpatialJoinData(leftLayer, operator, distance, rightLayer, style);
-}
-
-function getPropertyArrayBySelectValue(value) {
-    switch (value) {
-        case "0":
-        case "1":
-        case "2":
-        case "5": return polyProperties;
-        case "3":
-        case "4": return pointProperties;
-        case "6":
-        case "7":
-        case "8": return lineProperties;
-        default: return lineProperties;
-    }
-}
-
-function getFeatureTypeBySelectValue(value) {
-    switch (value) {
-        case "0":
-        case "1":
-        case "2":
-        case "5": return poly;
-        case "3":
-        case "4": return point;
-        case "6":
-        case "7":
-        case "8": return line;
-        default: return line;
-    }
-}
-
-function getDefaultFilterBySelectValue(value) {
-    switch (value) {
-        case "0": return defEducationFiler;
-        case "1": return defHospitalFiler;
-        case "2": return defSportFilter;
-        case "3": return defGasFilter;
-        case "4": return defPharmacyFilter;
-        case "5": return defForestFilter;
-        case "6": return defRiverFilter;
-        case "7": return defRailwayFilter;
-        case "8": return defRoadsFilter;
-        default: return "";
-    }
-}
-
-function getLayerStyleBySelectValue(value) {
-    switch (value) {
-        case "0": return educationStyle;
-        case "1": return hospitalStyle;
-        case "2": return sportStyle;
-        case "3": return null;
-        case "4": return null;
-        case "5": return forestStyle;
-        case "6": return riverStyle;
-        case "7": return railwayStyle;
-        case "8": return roadStyle;
-        default: return "";
-    }
 }
 
 function getSpatialJoinData(firstLayer, operator, distance, secondLayer, style) {
@@ -664,14 +459,224 @@ function resetTrafficJamSearch() {
         layerGroup.removeLayer(trafficLayer);
     }
 }
+/* COMMON FUNCTIONS BELLOW */
 
+// Ajax call WFS service - GetFeature request
+function callWFSService(layer, style, type, filter, addToMap = 1) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: "http://localhost:8080/geoserver/GIS/wfs",
+            data: {
+                service: "WFS",
+                version: "1.0.0",
+                request: "GetFeature",
+                typeName: type,
+                cql_filter: filter,
+                outputFormat: "application/json",
+                srsName: "epsg:4326",
+            },
+            dataType: "json",
+            success: function (response) {
+                layer = L.geoJSON(response, {
+                    style: style,
+                    pointToLayer: createCustomMarker,
+                    onEachFeature: addPopup
+                });
+
+                if (addToMap) {
+                    layerGroup.addLayer(layer);
+                }
+
+                resolve(layer);
+            },
+            error: function (error) {
+                reject(error)
+            }
+        })
+    })
+}
+
+// Leaflet call WMS service - GetMap request
+function callWMSService(layer, style, type, filter) {
+    var layer = new L.tileLayer.wms(
+        'http://localhost:8080/geoserver/GIS/wms',
+        {
+            layers: type,
+            format: 'image/png',
+            styles: style,
+            transparent: true,
+            cql_filter: filter
+        },
+    )
+    layerGroup.addLayer(layer);
+    return layer;
+}
+
+// Ajax call WFS service - DescribeFeatureType request
+function getProperties(type) {
+    $.ajax({
+        url: "http://localhost:8080/geoserver/GIS/wfs",
+        data: {
+            service: "WFS",
+            version: "1.0.0",
+            request: "DescribeFeatureType",
+            typeName: type,
+            outputFormat: "application/json"
+        },
+        dataType: "json",
+        success: function (response) {
+            if (type == "planet_osm_line" && lineProperties.length == 0) {
+                response.featureTypes[0].properties.forEach(x => {
+                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
+                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
+                        lineProperties.push(x.name)
+                    }
+                });
+            }
+
+            if (type == "planet_osm_polygon" && polyProperties.length == 0) {
+                response.featureTypes[0].properties.forEach(x => {
+                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
+                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
+                        polyProperties.push(x.name)
+                    }
+                });
+            }
+
+            if (type == "planet_osm_point" && pointProperties.length == 0) {
+                response.featureTypes[0].properties.forEach(x => {
+                    if (x.name != 'osm_id' && x.name != 'z_order' && x.name != 'way'
+                        && x.name != 'way_area' && x.name != 'access' && x.name != 'admin_level') {
+                        pointProperties.push(x.name)
+                    }
+                });
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    })
+}
+
+// Add popup to layer
+function addPopup(feature, layer) {
+    if (feature.properties != null) {
+        var infoText = '';
+        for (const [key, value] of Object.entries(feature.properties)) {
+            if (key != 'osm_id' && key != 'z_order' && key != 'way_area' && value != null) {
+                if (key == "vehicle_speed" || key == "average_speed") {
+                    infoText += `${key}: ${parseFloat(value * 1.609344).toFixed(2)}, `;
+                }
+                else {
+                    infoText += `${key}: ${value}, `;
+                }
+            }
+
+        }
+        layer.bindPopup(infoText);
+    }
+}
+
+
+
+// Custom marker to layer
+function createCustomMarker(feature, latlng) {
+    if (feature.properties != null && feature.properties.amenity != null && feature.properties.amenity == 'pharmacy') {
+        var myIcon = L.icon({
+            iconUrl: 'marker-red.png',
+            iconSize: [20, 35],
+            iconAnchor: [10, 35],
+            popupAnchor: [0, -35],
+        })
+        return L.marker(latlng, { icon: myIcon });
+    }
+    else if (feature.properties != null && feature.properties.amenity != null && feature.properties.amenity == 'fuel') {
+        var myIcon = L.icon({
+            iconUrl: 'marker-default.png',
+            iconSize: [20, 35],
+            iconAnchor: [10, 35],
+            popupAnchor: [0, -35],
+        })
+        return L.marker(latlng, { icon: myIcon });
+    }
+    else {
+        var style = {
+            radius: 3,
+            color: '#FF0000',
+            opacity: 0.75,
+        }
+        return L.circleMarker(latlng, style);
+    }
+}
+
+function getPropertyArrayBySelectValue(value) {
+    switch (value) {
+        case "0":
+        case "1":
+        case "2":
+        case "5": return polyProperties;
+        case "3":
+        case "4": return pointProperties;
+        case "6":
+        case "7":
+        case "8": return lineProperties;
+        default: return lineProperties;
+    }
+}
+
+function getFeatureTypeBySelectValue(value) {
+    switch (value) {
+        case "0":
+        case "1":
+        case "2":
+        case "5": return poly;
+        case "3":
+        case "4": return point;
+        case "6":
+        case "7":
+        case "8": return line;
+        default: return line;
+    }
+}
+
+function getDefaultFilterBySelectValue(value) {
+    switch (value) {
+        case "0": return defEducationFiler;
+        case "1": return defHospitalFiler;
+        case "2": return defSportFilter;
+        case "3": return defGasFilter;
+        case "4": return defPharmacyFilter;
+        case "5": return defForestFilter;
+        case "6": return defRiverFilter;
+        case "7": return defRailwayFilter;
+        case "8": return defRoadsFilter;
+        default: return "";
+    }
+}
+
+function getLayerStyleBySelectValue(value) {
+    switch (value) {
+        case "0": return educationStyle;
+        case "1": return hospitalStyle;
+        case "2": return sportStyle;
+        case "3": return null;
+        case "4": return null;
+        case "5": return forestStyle;
+        case "6": return riverStyle;
+        case "7": return railwayStyle;
+        case "8": return roadStyle;
+        default: return "";
+    }
+}
+
+//Add HTML on MAP
 legend.onAdd = function () {
     var div = L.DomUtil.create('div', 'legend');
     div.innerHTML = `
             <div class="form-check form-switch" style="margin-top: 5px;">
             <div class="legend-tag education"></div>
             <input class="form-check-input" type="checkbox" onchange="educationChange()" id="educationCheck">
-            <label class="form-check-label" for="flexSwitchCheckChecked">Educational inst..</label>
+            <label class="form-check-label" for="flexSwitchCheckChecked">Educational inst.</label>
         </div>
         <div class="form-check form-switch">
             <div class="legend-tag hospital"></div>

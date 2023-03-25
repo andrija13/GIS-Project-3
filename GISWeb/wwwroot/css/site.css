@@ -93,7 +93,6 @@ footer {
 }
 
 .fTitle {
-    color: #7E819D;
     font-weight: 600;
     padding-top: 25px;
 }
@@ -104,7 +103,6 @@ footer {
 
 .form-control {
     margin-top: 5px;
-    color: #ada7a7;
 }
 
 .form-control:focus{

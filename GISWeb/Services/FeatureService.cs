@@ -7,16 +7,20 @@ namespace GISWeb.Services
 {
     public class FeatureService : IFeatureService
     {
-        private readonly string connString = "Server=localhost; Port=5432; Database=GISDB; User Id=postgres; Password=admin;";
+        public IConfiguration configuration { get; set; }
 
-        public FeatureService()
+        private string? connectionString { get; set; }
+
+        public FeatureService(IConfiguration configuration)
         {
+            this.configuration = configuration;
+            this.connectionString = configuration.GetConnectionString("GisDbContext");
         }
 
         public List<string> GetSpatialJoinData(int firstLayer, int spatialOperator, decimal? distance, int secondLayer)
         {
             var result = new List<string>();
-            var connection = new NpgsqlConnection(connString);
+            var connection = new NpgsqlConnection(connectionString);
             connection.Open();
 
             var leftLayer = (Layer)firstLayer;
@@ -62,7 +66,7 @@ namespace GISWeb.Services
         public List<VehicleModel> GetAllVehicles()
         {
             var result = new List<VehicleModel>();
-            var connection = new NpgsqlConnection(connString);
+            var connection = new NpgsqlConnection(connectionString);
             connection.Open();
 
             var sqlSelect = @"SELECT DISTINCT vehicle_id, vehicle_type FROM sumo_fcd_data;";
@@ -89,7 +93,7 @@ namespace GISWeb.Services
         public List<string> GetTemporalData(int type, int temporalOperator, decimal value, int startTime, int endTime)
         {
             var result = new List<string>();
-            var connection = new NpgsqlConnection(connString);
+            var connection = new NpgsqlConnection(connectionString);
             connection.Open();
 
             var havingQuery = string.Empty;

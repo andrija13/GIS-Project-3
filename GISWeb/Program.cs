@@ -10,9 +10,6 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IFeatureService, FeatureService>();
 
-builder.Services.AddDbContext<GisdbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("GisDbContext")));
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

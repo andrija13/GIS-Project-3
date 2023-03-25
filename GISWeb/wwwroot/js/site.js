@@ -278,16 +278,22 @@ function getSpatialJoinData(firstLayer, operator, distance, secondLayer, style) 
             + '&distance=' + distance + '&secondLayer=' + parseInt(secondLayer),
         type: 'GET',
         success: function (response) {
-            spatialFilterLayer = L.geoJSON(JSON.parse(response[0]), {
-                style: style,
-                pointToLayer: createCustomMarker,
-                onEachFeature: addPopup
-            });
+            var jsonResult = JSON.parse(response[0]);
+            if (jsonResult.features != null && jsonResult.features.length > 0) {
+                spatialFilterLayer = L.geoJSON(jsonResult, {
+                    style: style,
+                    pointToLayer: createCustomMarker,
+                    onEachFeature: addPopup
+                });
 
-            layerGroup.addLayer(spatialFilterLayer);
+                layerGroup.addLayer(spatialFilterLayer);
+            }
+            else {
+                alert('No results found.');
+            }
         },
         error: function (response) {
-            console.log(response);
+            alert(response.responseText);
         }
     });
 }
@@ -364,23 +370,29 @@ function getTemporalData(type, operator, value, startTime, endTime, style) {
             + '&value=' + parseFloat(value) + '&startTime=' + parseInt(startTime) + '&endTime=' + parseInt(endTime),
         type: 'GET',
         success: function (response) {
-            temporalLayer = L.geoJSON(JSON.parse(response[0]), {
-                style: style,
-                pointToLayer: createCustomMarker,
-                onEachFeature: addPopup
-            });
+            var jsonResult = JSON.parse(response[0]);
+            if (jsonResult.features != null && jsonResult.features.length > 0) {
+                temporalLayer = L.geoJSON(jsonResult, {
+                    style: style,
+                    pointToLayer: createCustomMarker,
+                    onEachFeature: addPopup
+                });
 
-            layerGroup.addLayer(temporalLayer);
+                layerGroup.addLayer(temporalLayer);
+            }
+            else {
+                alert('No results found.');
+            }
         },
         error: function (response) {
-            console.log(response);
+            alert(response.responseText);
         }
     });
 }
 
 function resetTemporalSearch() {
-    $('#temporalType').val("");
-    $('#temporalOperator').val("");
+    $('#temporalType').val("-1");
+    $('#temporalOperator').val("-1");
     $('#temporalValue').val("");
     $('#temporalStartTime').val("");
     $('#temporalEndTime').val("");
@@ -477,20 +489,26 @@ function callWFSService(layer, style, type, filter, addToMap = 1) {
             },
             dataType: "json",
             success: function (response) {
-                layer = L.geoJSON(response, {
-                    style: style,
-                    pointToLayer: createCustomMarker,
-                    onEachFeature: addPopup
-                });
+                if (response.features.length > 0) {
+                    layer = L.geoJSON(response, {
+                        style: style,
+                        pointToLayer: createCustomMarker,
+                        onEachFeature: addPopup
+                    });
 
-                if (addToMap) {
-                    layerGroup.addLayer(layer);
+                    if (addToMap) {
+                        layerGroup.addLayer(layer);
+                    }
+
+                    resolve(layer);
                 }
-
-                resolve(layer);
+                else {
+                    alert('No results found.');
+                }
             },
             error: function (error) {
-                reject(error)
+                alert(error.responseText);
+                reject(error);
             }
         })
     })

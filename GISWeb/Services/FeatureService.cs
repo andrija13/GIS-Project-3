@@ -118,23 +118,31 @@ namespace GISWeb.Services
                                 'type', 'FeatureCollection',
                                 'features', json_agg(ST_AsGeoJSON(t.*)::json)
                             )
-                            FROM (SELECT l.osm_id, l.amenity, l.area, l.boundary, l.building, l.construction, 
-	                              l.highway, l.historic, l.landuse, l.layer, l.leisure, l.motorcar, l.name, l.""natural"",
-	                              l.oneway, l.operator, l.place, l.population, l.railway, l.shop, l.sport, l.surface,
-	                              l.toll, l.water, l.waterway, l.wood, C.count_of_vehicle, (C.average_speed * 1.609344) as average_speed, ST_Transform(l.way,4326) way
-                                  FROM planet_osm_line l 
-                                  JOIN (
-                                    SELECT COUNT(car.vehicle_id) count_of_vehicle, 
-                                    AVG(car.vehicle_speed) average_speed, road.name roadName
-                                    FROM planet_osm_line AS road
-                                    JOIN sumo_fcd_data AS car
-                                    ON ST_DWithin(road.way, car.way, 4)
-                                    WHERE timestep_time >= {0} AND timestep_time <= {1}
-                                    GROUP BY car.vehicle_id, road.name
-                                    HAVING {2}
-                                    ) C ON l.name = C.roadName
-                                    ORDER BY {3}
+                            FROM (
+                                WITH C AS (
+						            SELECT --car.vehicle_id, 
+						            COUNT(car.vehicle_id) count_of_vehicle,
+						            AVG(car.vehicle_speed) average_speed, road.name roadName
+						            FROM sumo_fcd_data AS car 
+						            JOIN planet_osm_line AS road
+						            ON ST_DWithin(road.way, car.way, 4) AND road.name is not null
+						            WHERE car.timestep_time >= {0} AND timestep_time <= {1}
+						            GROUP BY car.vehicle_id, road.name
+						            HAVING {2}
                                     LIMIT 100
+	                            ) 
+                                SELECT l.amenity, l.area, l.boundary, l.building, l.construction, 
+	                                   l.highway, l.historic, l.landuse, l.layer, l.leisure, 
+                                       l.motorcar, l.name, l.natural, l.oneway, l.operator, 
+                                       l.place, l.population, l.railway, l.shop, l.sport, l.surface,
+	                                   l.toll, l.water, l.waterway, l.wood, C.count_of_vehicle, 
+                                       (C.average_speed * 1.609344) as average_speed, 
+                                       ST_Transform(l.way,4326) way 
+								FROM C
+	                            JOIN  
+                                planet_osm_line l 
+                                ON C.roadName = l.name
+                                LIMIT 100
                                 ) as t;",
                                 startTime, endTime, havingQuery, orderBy);
 

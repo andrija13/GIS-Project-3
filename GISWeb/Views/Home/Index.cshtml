@@ -7,9 +7,12 @@
 }
 
 <div class="legendDiv col-sm-3">
+    <div class="header">
+        <h2>GIS Web App</h2>
+    </div>
     <div class="filter">
         <div class="basicFilter">
-            <label>Basic layer search:</label>
+            <label class="fTitle">Basic layer filter:</label>
             <div>
                 @Html.DropDownList("BasicFilterLayer", listOfLayers, "Select layers", new { @class = "form-control"})
             </div>
@@ -18,7 +21,7 @@
             </div>
             <div>
                 <input class="form-control" id="basicFilterCondition" placeholder="Type a condition..." />
-                <label style="font-size:8pt">
+                <label style="font-size:8pt;padding: 0.5rem 0.5rem 0 0.5rem;width: 100%; color: #7E819D;">
                     Allowed operators: =,&lt,&gt,&gt=,&lt=, LIKE, IN, NOT
                     <br />
                     Example: LIKE '%Александар%'
@@ -30,7 +33,7 @@
             </div>
         </div>
         <div class="spatialFilter">
-            <label>Spatial layer filter:</label>
+            <label class="fTitle">Spatial layer filter:</label>
             <div>
                 @Html.DropDownList("SpatialLeftLayer", listOfLayers, "Select first layers", new { @class = "form-control"})
             </div>
@@ -48,7 +51,7 @@
         </div>
         <div class="spatialTemporalFilter">
             <div>
-                <label>Find all roads where:</label>
+                <label class="fTitle">Find roads where:</label>
                 <select class="form-control" id="temporalType">
                     <option disabled hidden>Select type of query</option>
                     <option value="0">Number of car</option>
@@ -67,8 +70,8 @@
                 <input class="form-control" type="number" id="temporalValue" placeholder="Type a value..."/>
             </div>
             <div class="raw" style="display:flex;">
-                <input class="form-control" type="number" id="temporalStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
-                <input class="form-control" type="number" id="temporalEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
+                <input class="form-control time" type="number" id="temporalStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
+                <input class="form-control time" type="number" id="temporalEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
                 <button type="button" class="btn btn-primary btn-sm" id="btnTemporalFilter" onclick="temporalSearch()">Search</button>
@@ -76,7 +79,7 @@
             </div>
         </div>
         <div class="trajectoriesFilter">
-            <label>Find trajectories of vehicles:</label>
+            <label class="fTitle">Find trajectories of vehicles:</label>
             <div>
                 @Html.DropDownList("TypeOfVehicle", vehicleTypes, "Select type of vehicle", new { @class = "form-control"})
             </div>
@@ -84,8 +87,8 @@
                 @Html.DropDownList("VehicleId", new List<SelectListItem>(), "Select vehicle", new { @class = "form-control"})
             </div>
             <div class="raw" style="display:flex;">
-                <input class="form-control" type="number" id="trajectoryStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
-                <input class="form-control" type="number" id="trajectoryEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
+                <input class="form-control time" type="number" id="trajectoryStartTime" min="0" max="2500" placeholder="Start time (min: 0)" />
+                <input class="form-control time" type="number" id="trajectoryEndTime" min="0" max="2500" placeholder="End time (max: 2500)" />
             </div>
             <div>
                 <button type="button" class="btn btn-primary btn-sm" id="btnTrajectoriesFilter" onclick="trajectoriesSearch()">Search</button>
@@ -93,7 +96,7 @@
             </div>
         </div>
         <div class="trafficFilter">
-            <label>Find popular area at:</label>
+            <label class="fTitle">Find popular area at:</label>
             <div class="raw" style="display:flex;">
                 <input class="form-control" type="number" id="trafficStartTime" min="0" max="2500" placeholder="Enter time (min: 0, max: 2500)" />
             </div>

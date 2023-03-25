@@ -1,3 +1,6 @@
+@import url('https://fonts.cdnfonts.com/css/poppins');
+@import url('https://fonts.cdnfonts.com/css/lato');
+
 html {
   font-size: 14px;
 }
@@ -8,26 +11,138 @@ html {
   }
 }
 
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #ada7a7;
+    opacity: 1; /* Firefox */
+}
+
+.form-control:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: #ada7a7;
+}
+
 html {
   position: relative;
   min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    /*margin-bottom: 60px;*/
+}
+
+.navbar{
+    display: none;
 }
 
 footer {
+    display: none;
     text-align: center;
 }
 
 #map {
-    height: calc(100vh - 117px);
+    height: 100vh;
 }
 
 .row {
     margin: 0;
 }
+
+.legendDiv{
+    padding: 0px;
+    font-family: 'Lato', sans-serif;
+}
+
+.header {
+    background: rgb(24,157,255);
+    background: linear-gradient(90deg, rgba(24,157,255,1) 0%, rgba(44,198,236,1) 100%);
+    color: #FFF;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    height: 70px;
+}
+
+.header h2{
+    margin: 0;
+    font-weight: 400;
+}
+
+.filter {
+    padding: 0 20px;
+    height: calc(100vh - 70px);
+    overflow-y: scroll;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(24,157,255); 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgb(44,198,236,1); 
+}
+
+.fTitle {
+    color: #7E819D;
+    font-weight: 600;
+    padding-top: 25px;
+}
+
+.time {
+    letter-spacing: -1.3px;
+}
+
+.form-control {
+    margin-top: 5px;
+    color: #ada7a7;
+}
+
+.form-control:focus{
+    box-shadow: none;
+}
+
+.btn {
+    padding: 5px 25px;
+    border-radius: 10px;
+    margin-top: 10px;
+    margin-right: 5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn:focus{
+    box-shadow: none;
+}
+
+.btn-primary {
+    background: #1aa0fe;
+    border: 2px solid #1aa0fe !important;
+}
+
+.btn-outline-danger {
+    border-width: 2px;
+}
+
+.trafficFilter {
+    padding-bottom: 25px;
+}
+
+.raw{
+    gap: 10px;
+}
+
+/*.leaflet-bottom.leaflet-right{
+    display: none;
+}*/
 
 .legend {
     line-height: 18px;
